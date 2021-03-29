@@ -8,10 +8,14 @@ branding:
 
 inputs:
   github-token:
-    description: Your GitHub access token
+    description: Your GitHub access token.
     required: true
   environment:
-    description: The deployment environment to wait for
+    description: The deployment environment to wait for.
+    required: true
+  sha:
+    description: The SHA of the commit being deployed.
+    required: true
   timeout:
     description: The number of seconds after which to fail if no deployment is found.
     default: 30
@@ -28,4 +32,3 @@ outputs:
 runs:
   using: node12
   main: index.js
-

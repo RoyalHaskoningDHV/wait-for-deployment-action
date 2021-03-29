@@ -4,6 +4,7 @@ const github = require('@actions/github')
 const options = {
   token: core.getInput('github-token'),
   environment: core.getInput('environment'),
+  sha: core.getInput('sha'),
   timeout: core.getInput('timeout'),
   interval: core.getInput('interval')
 }
@@ -21,12 +22,12 @@ async function waitForDeployment (options) {
   const {
     token,
     interval,
-    environment
+    environment,
+    sha
   } = options
 
   const timeout = parseInt(options.timeout) || 30
 
-  const { sha } = github.context
   const octokit = github.getOctokit(token)
   const start = Date.now()
 
