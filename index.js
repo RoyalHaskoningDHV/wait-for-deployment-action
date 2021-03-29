@@ -21,12 +21,12 @@ waitForDeployment(options)
 async function waitForDeployment (options) {
   const {
     token,
-    interval,
     environment,
     sha
   } = options
 
-  const timeout = parseInt(options.timeout) || 30
+  const interval = options.interval ? parseInt(options.interval) : 5
+  const timeout = options.timeout ? parseInt(options.timeout) : 30
 
   const octokit = github.getOctokit(token)
   const start = Date.now()
@@ -89,6 +89,6 @@ async function waitForDeployment (options) {
 }
 
 function sleep (seconds) {
-  const ms = parseInt(seconds) * 1000 || 1
+  const ms = seconds * 1000
   return new Promise(resolve => setTimeout(resolve, ms))
 }
