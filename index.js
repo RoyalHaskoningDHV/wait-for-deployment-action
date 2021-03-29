@@ -47,33 +47,39 @@ async function waitForDeployment (options) {
     for (const deployment of deployments) {
       core.info(`\tgetting statuses for deployment ${deployment.id}...`)
 
-      const { data: statuses } = await octokit.request('GET /repos/:owner/:repo/deployments/:deployment/statuses', {
-        ...github.context.repo,
-        deployment: deployment.id
-      })
+      // note: sometimes the github API will throw a not found error when the deployment statuses are requested
+      // immediately after listing the deployments, which is why we wrap this call in a try/catch and retry if it fails
+      try {
+        const { data: statuses } = await octokit.request('GET /repos/:owner/:repo/deployments/:deployment/statuses', {
+          ...github.context.repo,
+          deployment: deployment.id
+        })
 
-      core.info(`\tfound ${statuses.length} statuses`)
+        core.info(`\tfound ${statuses.length} statuses`)
 
-      const [success] = statuses
-        .filter(status => status.state === 'success')
-      if (success) {
-        core.info(`\tsuccess! ${JSON.stringify(success, null, 2)}`)
-        let url = success.target_url
-        const { payload = {} } = deployment
-        if (payload.web_url) {
-          url = payload.web_url
+        const [success] = statuses
+          .filter(status => status.state === 'success')
+        if (success) {
+          core.info(`\tsuccess! ${JSON.stringify(success, null, 2)}`)
+          let url = success.target_url
+          const { payload = {} } = deployment
+          if (payload.web_url) {
+            url = payload.web_url
+          }
+          return {
+            deployment,
+            status: success,
+            url
+          }
+        } else {
+          core.info(`No statuses with state === "success": "${statuses.map(status => status.state).join('", "')}"`)
         }
-        return {
-          deployment,
-          status: success,
-          url
-        }
-      } else {
-        core.info(`No statuses with state === "success": "${statuses.map(status => status.state).join('", "')}"`)
+      } catch (error) {
+        // don't do anything, we retry in the next iteration
       }
-
-      await sleep(interval)
     }
+
+    await sleep(interval)
 
     const elapsed = (Date.now() - start) / 1000
     if (elapsed >= timeout) {
