@@ -1,4 +1,4 @@
-name: Wait for deployment
+name: Wait for deployment with SHA
 description: |
   Block until a deployment is finished for the pushed commit,
   and get the URL for running any further tests.
