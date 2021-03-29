@@ -14,7 +14,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: RoyalHaskoningDHV/wait-for-deployment-action@v3
+      - uses: RoyalHaskoningDHV/wait-for-deployment-action@v3.1
         id: deployment
         with:
           token: ${{ github.token }}
@@ -33,8 +33,6 @@ This is the deployment environment to target.
 
 ### `sha`
 The SHA of the commit being deployed.
-
-**TODO:** document how to set the environment conditionally.
 
 ### `timeout`
 The number of seconds after which to give up with an error. Default: 30.
